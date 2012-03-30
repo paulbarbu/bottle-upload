@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>{{title or "Upload files to paullik's"}}</title>
+<title>{{title or "Upload files"}}</title>
 </head>
 <body>
     %include
