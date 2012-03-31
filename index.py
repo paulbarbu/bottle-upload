@@ -1,7 +1,9 @@
 #! /usr/bin/env python2.7
 
+import bottle
 from bottle import run, debug, get, post, request, template, redirect, install, response
 from bottle_sqlite import SQLitePlugin
+from beaker.middleware import SessionMiddleware
 import re
 import os.path
 import sqlite3
@@ -10,12 +12,10 @@ import logging
 import err
 import const
 
-install(SQLitePlugin(dbfile=const.DB_FILENAME))
-
 #TODO test this
 @get('/')
 def index():
-    if not request.cookies.get('user', False):
+    if not is_logged_in():
         redirect('/login')
     else:
         redirect('/upload')
@@ -23,7 +23,7 @@ def index():
 #TODO test this
 @get('/register')
 def register_view():
-    if not request.cookies.get('user', False):
+    if not is_logged_in():
         return template('register')
     else:
         redirect('/upload')
@@ -76,7 +76,7 @@ def register_bl(db):
 #TODO test this
 @get('/login')
 def login_view():
-    if not request.cookies.get('user', False):
+    if not is_logged_in():
         return template('login')
     else:
         redirect('/upload')
@@ -95,8 +95,15 @@ def login_bl(db):
     uid  = get_user_id(db, nick, password)
 
     if uid:
-        #TODO: create the session
-        response.set_cookie('user', str(uid), httponly=True)
+        sess = request.environ.get('beaker.session')
+        sess['uid'] = uid
+
+        #TODO add expiration time if the user checks "remember me"
+        #set the cookie_expires and session.timeout time to 30 days
+        #or just overwrite the beaker.session.id cookie writing the same session
+        #id but another expiry date, session.timeout stays 30 days
+        #else, if remember me wasn't checked, cookie_expires: True, and
+        #session.timeout: 1220
 
         message = const.L_SUCCESS
         nick = get_nick_by_id(db, uid)
@@ -117,11 +124,14 @@ def login_bl(db):
 
 #TODO test this
 @get('/upload')
-def upload():
-    if not request.cookies.get('user', False):
+def upload(db):
+    if not is_logged_in():
         redirect('/login')
     else:
-        return 'upload'
+        sess = request.environ.get('beaker.session')
+        sess.get_by_id(request.cookies.get('beaker.session.id'))
+
+        return 'Hello ' + get_nick_by_id(db, sess['uid'])
 
 def is_valid_nick(nick):
     '''A nick is valid when it contains at least one alphanumeric character'''
@@ -225,6 +235,37 @@ def get_nick_by_id(db, uid):
 
     return str(rv[0])
 
+def is_logged_in():
+    '''Check whether the user sent a cookie that holds a Beaker created
+    session id
+    '''
+
+    sess_id = request.cookies.get('beaker.session.id', False)
+
+    if not sess_id:
+        return False
+
+    sess = request.environ.get('beaker.session')
+
+    if 'uid' not in sess:
+        return False
+
+    return True
+
+install(SQLitePlugin(dbfile=const.DB_FILENAME))
+
+session_opts = {
+        'session.auto': True,
+        'session.cookie_expires': True,
+        'session.timeout': 1440,
+        'session.type': 'file',
+        'session.data_dir': './data',
+        'session.httponly': True,
+}
+
+app = bottle.app()
+app = SessionMiddleware(app, session_opts)
+
 if __name__ == '__main__':
     logging.basicConfig(filename='logs.log', format='%(levelname)s: %(asctime)s - %(message)s',
             level=logging.DEBUG, datefmt='%d-%m-%Y %H:%M:%S')
@@ -234,4 +275,7 @@ if __name__ == '__main__':
         logging.critical(err.SQLITE_FILE)
     else:
         debug(True)
-        run(host="localhost", port="8080", reloader=True)
+        run(app=app, host="localhost", port="8080", reloader=True)
+
+    #TODO: delete old session files aka logout
+    #TODO: add a menu
