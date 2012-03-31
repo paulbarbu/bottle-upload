@@ -267,8 +267,9 @@ app = bottle.app()
 app = SessionMiddleware(app, session_opts)
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='logs.log', format='%(levelname)s: %(asctime)s - %(message)s',
-            level=logging.DEBUG, datefmt='%d-%m-%Y %H:%M:%S')
+    logging.basicConfig(filename='logs.log', level=logging.DEBUG,
+            format='%(levelname)s: %(asctime)s - %(message)s',
+            datefmt='%d-%m-%Y %H:%M:%S')
 
     if not is_valid_sqlite3(const.DB_FILENAME):
         print err.SQLITE_FILE_USER
