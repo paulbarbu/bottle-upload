@@ -1,4 +1,3 @@
-#! /usr/bin/env python2.7
 import unittest
 
 class DatabaseTest(unittest.TestCase):
