@@ -172,14 +172,17 @@ def is_valid_sqlite3(db):
     Note that I'm discarding the last byte, namely: '\0'
     '''
 
-    if not os.path.isfile(db):
-        return False
+    #TODO: think about this -- commented because of testing purposes
+    #if not os.path.isfile(db):
+        #return False
 
     with open(db, 'r') as f:
         if f.read(15) == 'SQLite format 3':
             return True
 
         return False
+
+    return False
 
 #TODO test this
 def add_user(db, nick, email, password):
@@ -288,5 +291,4 @@ if __name__ == '__main__':
         debug(True)
         run(app=app, host="localhost", port="8080", reloader=True)
 
-    #TODO: delete old session files aka logout
     #TODO: add a menu
