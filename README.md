@@ -6,6 +6,15 @@ with bottle.
 
 Also this is the first application I have ever unit-tested.
 
+Things learned in this project (random order)
+==============================
+* bottle.py - a micro web framework
+* beaker - middleware for manipulatin sessions
+* how to use a template engine (the one shipped with bottle)
+* the unittest module in stdlib for testing
+* mock - mocking objects and monkey patching for isolation tests
+* SQLite3 database
+
 License
 =======
 
