@@ -131,7 +131,17 @@ def upload(db):
         sess = request.environ.get('beaker.session')
         sess.get_by_id(request.cookies.get('beaker.session.id'))
 
-        return 'Hello ' + get_nick_by_id(db, sess['uid'])
+        return template('upload', nick=get_nick_by_id(db, sess['uid']))
+
+@get('/logout')
+def logout():
+    if not is_logged_in():
+        redirect('/login')
+    else:
+        sess = request.environ.get('beaker.session')
+        sess.delete()
+
+        return template('logout.tpl')
 
 def is_valid_nick(nick):
     '''A nick is valid when it contains at least one alphanumeric character'''
