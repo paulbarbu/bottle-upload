@@ -1,7 +1,7 @@
 #! /usr/bin/env python2.7
 
 import bottle
-from bottle import run, debug, get, post, request, template, redirect, install, response
+from bottle import run, debug, get, post, request, template, redirect, install
 from bottle_sqlite import SQLitePlugin
 from beaker.middleware import SessionMiddleware
 import re
@@ -104,6 +104,12 @@ def login_bl(db):
         #id but another expiry date, session.timeout stays 30 days
         #else, if remember me wasn't checked, cookie_expires: True, and
         #session.timeout: 1220
+
+
+        #try accessing beaker.session.session (dir())
+        #maybe I can set a cookie using the information in sess._headers and
+        #sess._params but then how can I set the session's timeout if I use
+        #files as a backend, in a DB i'd check the creation time + time_delta
 
         message = const.L_SUCCESS
         nick = get_nick_by_id(db, uid)
@@ -316,6 +322,7 @@ if __name__ == '__main__':
         logging.critical(err.SQLITE_FILE)
     else:
         debug(True)
-        run(app=app, host="localhost", port="8080", reloader=True)
+        run(app=app, host='localhost', port='8080', reloader=True)
 
     #TODO: add a menu
+    #TODO: http://pyramid.readthedocs.org/en/1.3-branch/narr/testing.html
