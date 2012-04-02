@@ -1,3 +1,5 @@
 DB_FILENAME = 'upload.db'
 R_SUCCESS = 'Registration successful!'
 L_SUCCESS = 'Logged in'
+UPLOAD_PATH = 'uploads'
+U_SUCCESS = 'Uploaded!'

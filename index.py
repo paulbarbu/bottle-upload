@@ -128,11 +128,38 @@ def upload(db):
     if not is_logged_in():
         redirect('/login')
     else:
+        return template('upload')
+
+#TODO: test this
+@post('/upload')
+def upload_view(db):
+    message = None
+    error = None
+
+    file_data = request.files.file_data
+
+    if file_data.file:
         sess = request.environ.get('beaker.session')
         sess.get_by_id(request.cookies.get('beaker.session.id'))
 
-        return template('upload', nick=get_nick_by_id(db, sess['uid']))
+        upload_dir = os.path.join(os.getcwd(), const.UPLOAD_PATH, get_nick_by_id(db, sess['uid']))
 
+        if not os.path.isdir(upload_dir):
+            #check write permissions
+            os.makedirs(upload_dir)
+
+        #here write permissions should be checked too
+        with open(os.path.join(upload_dir, file_data.filename), 'w') as f:
+            f.write(file_data.file.read())
+
+        message = const.U_SUCCESS
+    else:
+        error = err.NO_FILE
+
+    return template('upload', message=message, error=error)
+
+
+#TODO: test this
 @get('/logout')
 def logout():
     if not is_logged_in():

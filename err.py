@@ -32,7 +32,13 @@ NO_USER = {
     'msg': 'The credentials provided are incorrect!',
     'code': 7
 }
+
 SQLITE_FILE_USER = '''Aborting: The SQLite DB file is invalid!
 Use bin/schema.py to create a valid one!'''
 
 SQLITE_FILE = '''Invalid SQLite database'''
+
+NO_FILE = {
+    'msg': 'No file selected!',
+    'code':  8
+}
