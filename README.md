@@ -18,7 +18,7 @@ Things learned in this project (random order)
 License
 =======
 
-(c) Barbu Paul - Gheorghe
+(C) Copyright 2012 Barbu Paul - Gheorghe
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
